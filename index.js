@@ -1,11 +1,10 @@
 const LOGIN_PAGE = 'https://stackoverflow.com/users/login';
-const Nightmare = require('nightmare');
+const { Chromeless } = require('chromeless');
 const Mailgun = require('mailgun-js');
 const confFile = require('./conf.json');
-const nightmare = Nightmare({show: false});
 
 let mailgun = null;
-if (!confFile.mailgun_api_key && confFile.mailgun_domain) {
+if (confFile.mailgun_api_key && confFile.mailgun_domain) {
     mailgun = Mailgun({
         apiKey: confFile.mailgun_api_key,
         domain: confFile.mailgun_domain
@@ -31,35 +30,34 @@ function sendMail(subject, text) {
                 text: text
             }, (error, body) => {
                 if (error) {
-                    console.error("Error:", body, "|", text);
+                    console.error("MAIL Error:", body, "|", text);
                     throw error;
                 }
             });
     }
-    console.log(subject, text);
 }
 
-console.log("Start");
+async function run() {
+  const chromeless = new Chromeless()
 
-nightmare
+  const text = await chromeless
     .goto(LOGIN_PAGE)
     .wait('#login-form')
-    .type('#email', confFile.email)
-    .type('#password', confFile.password)
+    .type(confFile.email, '#email')
+    .type(confFile.password, '#password')
     .click('#submit-button')
     .wait('a.my-profile')
     .click('a.my-profile')
     .wait('#top-cards')
     .evaluate(() => {
-        const el = document.querySelector('#top-cards span.-count');
-        return el ? el.innerText : 'null';
+      // this will be executed in headless chrome
+      const el = document.querySelector('#top-cards span.-count');
+      return el && el.innerText;
     })
-    .end()
-    .then(progressText => {
-        processResult(progressText);
-    })
-    .catch(function (error) {
-        processError(error);
-    });
 
-console.log("End");
+  await chromeless.end();
+
+  return text;
+}
+
+run().then(processResult).catch(processError);

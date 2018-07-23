@@ -1,14 +1,15 @@
 {
-  "name": "so_visitor",
+  "name": "so_login",
   "version": "1.0.0",
   "main": "index.js",
-  "author": "Deliaz",
+  "author": "LaughDonor",
   "license": "MIT",
   "dependencies": {
-    "mailgun-js": "^0.10.1",
-    "nightmare": "^2.10.0"
+    "mailgun-js": "^0.20.0",
+    "chromeless": "^1.5.2"
   },
   "scripts": {
-    "start": "DEBUG=nightmare* node --harmony index.js"
+    "debug": "DEBUG=* node --harmony index.js",
+    "start": "node index.js"
   }
 }

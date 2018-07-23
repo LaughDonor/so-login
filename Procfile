@@ -1,1 +1,1 @@
-worker: DEBUG=nightmare* node --harmony index.js
+worker: node --harmony index.js
